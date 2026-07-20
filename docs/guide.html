@@ -1,0 +1,981 @@
+<title>HardwareHub — Setup, Testing &amp; User Guide</title>
+<meta name="description" content="Reference manual for the HardwareHub multi-vendor MERN platform: environment setup, role-based user guide, and a testing checklist." />
+
+<style>
+  :root {
+    --bg: #EDEFEF;
+    --surface: #FFFFFF;
+    --surface-2: #F5F6F6;
+    --ink: #1B2225;
+    --ink-soft: #5B6569;
+    --ink-faint: #838C8F;
+    --border: #D3D8D9;
+    --border-strong: #B7BEC0;
+    --accent: #C1440E;
+    --accent-ink: #8A3009;
+    --accent-soft: #F4DDCE;
+
+    --role-customer: #2B5F8A;
+    --role-customer-soft: #DCE8F2;
+    --role-vendor: #B5541C;
+    --role-vendor-soft: #F3DECB;
+    --role-admin: #4B3F63;
+    --role-admin-soft: #E2DEEA;
+
+    --status-pending: #8A6A0A;
+    --status-pending-soft: #F7ECC9;
+    --status-processing: #2B5F8A;
+    --status-processing-soft: #DCE8F2;
+    --status-delivered: #2F6E4E;
+    --status-delivered-soft: #DCEFE1;
+
+    --mono: ui-monospace, "SF Mono", "IBM Plex Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: Optima, Candara, "Noto Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+    --shadow: 0 1px 2px rgba(27, 34, 37, 0.06), 0 4px 14px rgba(27, 34, 37, 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15181A;
+      --surface: #1C2124;
+      --surface-2: #20262A;
+      --ink: #E7EBEA;
+      --ink-soft: #A4ADAF;
+      --ink-faint: #6E787A;
+      --border: #333B3E;
+      --border-strong: #454F52;
+      --accent: #E67A3E;
+      --accent-ink: #F2AD7C;
+      --accent-soft: #3A2A1E;
+
+      --role-customer: #6FA3D1;
+      --role-customer-soft: #223140;
+      --role-vendor: #E2915A;
+      --role-vendor-soft: #3A2B1E;
+      --role-admin: #A79BC4;
+      --role-admin-soft: #2A2536;
+
+      --status-pending: #D9B54A;
+      --status-pending-soft: #362D14;
+      --status-processing: #6FA3D1;
+      --status-processing-soft: #1E2A34;
+      --status-delivered: #6FBE8E;
+      --status-delivered-soft: #1B2E22;
+
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 18px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15181A; --surface: #1C2124; --surface-2: #20262A;
+    --ink: #E7EBEA; --ink-soft: #A4ADAF; --ink-faint: #6E787A;
+    --border: #333B3E; --border-strong: #454F52;
+    --accent: #E67A3E; --accent-ink: #F2AD7C; --accent-soft: #3A2A1E;
+    --role-customer: #6FA3D1; --role-customer-soft: #223140;
+    --role-vendor: #E2915A; --role-vendor-soft: #3A2B1E;
+    --role-admin: #A79BC4; --role-admin-soft: #2A2536;
+    --status-pending: #D9B54A; --status-pending-soft: #362D14;
+    --status-processing: #6FA3D1; --status-processing-soft: #1E2A34;
+    --status-delivered: #6FBE8E; --status-delivered-soft: #1B2E22;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 18px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    --bg: #EDEFEF; --surface: #FFFFFF; --surface-2: #F5F6F6;
+    --ink: #1B2225; --ink-soft: #5B6569; --ink-faint: #838C8F;
+    --border: #D3D8D9; --border-strong: #B7BEC0;
+    --accent: #C1440E; --accent-ink: #8A3009; --accent-soft: #F4DDCE;
+    --role-customer: #2B5F8A; --role-customer-soft: #DCE8F2;
+    --role-vendor: #B5541C; --role-vendor-soft: #F3DECB;
+    --role-admin: #4B3F63; --role-admin-soft: #E2DEEA;
+    --status-pending: #8A6A0A; --status-pending-soft: #F7ECC9;
+    --status-processing: #2B5F8A; --status-processing-soft: #DCE8F2;
+    --status-delivered: #2F6E4E; --status-delivered-soft: #DCEFE1;
+    --shadow: 0 1px 2px rgba(27,34,37,0.06), 0 4px 14px rgba(27,34,37,0.06);
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--accent-soft); color: var(--accent-ink); }
+
+  a { color: var(--accent-ink); text-decoration-color: var(--border-strong); text-underline-offset: 3px; }
+  a:hover { text-decoration-color: currentColor; }
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--mono);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  code, kbd, .tag, .eyebrow, .mono, table { font-family: var(--mono); }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- Shell ---------- */
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  header.masthead {
+    padding: 44px 0 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  header.masthead .eyebrow { color: var(--accent-ink); }
+  header.masthead h1 {
+    font-size: clamp(28px, 4vw, 40px);
+    margin: 10px 0 12px;
+  }
+  header.masthead p.lede {
+    max-width: 62ch;
+    color: var(--ink-soft);
+    font-size: 17px;
+    margin: 0 0 18px;
+  }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .badge {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    color: var(--ink-soft);
+    background: var(--surface);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px;
+    padding-top: 32px;
+    align-items: start;
+  }
+
+  nav.toc {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-right: 8px;
+  }
+  nav.toc a {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 6px 10px;
+    border-left: 2px solid transparent;
+    border-radius: 0 3px 3px 0;
+  }
+  nav.toc a:hover { color: var(--ink); background: var(--surface-2); }
+  nav.toc .toc-group {
+    margin-top: 14px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 0 10px;
+  }
+  nav.toc .toc-group:first-child { margin-top: 0; }
+
+  main { min-width: 0; }
+
+  section.block { padding: 56px 0; border-bottom: 1px solid var(--border); }
+  section.block:last-child { border-bottom: none; }
+  section.block > .eyebrow { color: var(--accent-ink); }
+  section.block h2 { font-size: 24px; margin: 8px 0 6px; }
+  section.block > p.intro { color: var(--ink-soft); max-width: 68ch; margin: 0 0 28px; }
+
+  h3 { font-size: 16px; margin: 0 0 10px; }
+  p { max-width: 68ch; }
+
+  /* ---------- Step list (real sequence) ---------- */
+  ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  ol.steps > li {
+    counter-increment: step;
+    position: relative;
+    padding: 0 0 28px 44px;
+    border-left: 1px solid var(--border);
+    margin-left: 15px;
+  }
+  ol.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  ol.steps > li::before {
+    content: counter(step);
+    position: absolute;
+    left: -15px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  ol.steps h3 { margin-bottom: 8px; }
+  ol.steps p { color: var(--ink-soft); margin: 0 0 10px; font-size: 15px; }
+
+  /* ---------- Code blocks ---------- */
+  .code-block {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    margin: 10px 0 4px;
+  }
+  .code-block pre {
+    margin: 0;
+    padding: 14px 44px 14px 16px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .code-block .comment { color: var(--ink-faint); }
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { color: var(--ink); border-color: var(--border-strong); }
+  .copy-btn[data-copied="true"] { color: var(--status-delivered); border-color: var(--status-delivered); }
+
+  /* ---------- Tables ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 480px; }
+  table caption { text-align: left; padding: 10px 14px; font-family: var(--sans); font-size: 13px; color: var(--ink-soft); background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  thead th { background: var(--surface-2); color: var(--ink-faint); font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; font-size: 11px; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.wrap, th.wrap { white-space: normal; }
+
+  /* ---------- Role cards ---------- */
+  .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 8px; }
+  .role-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--role-color, var(--accent));
+    border-radius: 4px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow);
+  }
+  .role-card .role-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--role-color, var(--accent));
+    background: var(--role-soft, var(--accent-soft));
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+  }
+  .role-card h3 { margin: 0 0 8px; }
+  .role-card ul { margin: 8px 0 0; padding-left: 18px; color: var(--ink-soft); font-size: 14.5px; }
+  .role-card ul li { margin-bottom: 4px; }
+
+  section.role-section { padding: 40px 0; border-top: 1px dashed var(--border); }
+  section.role-section:first-of-type { border-top: none; }
+  section.role-section .role-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--role-color); background: var(--role-soft);
+    padding: 5px 10px; border-radius: 3px;
+  }
+  section.role-section h3.flow-title { font-size: 20px; margin: 10px 0 4px; }
+  section.role-section p.flow-sub { color: var(--ink-soft); margin: 0 0 22px; }
+
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .flow-step .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--role-color); margin-top: 8px;
+  }
+  .flow-step strong { font-size: 15px; }
+  .flow-step p { margin: 4px 0 0; color: var(--ink-soft); font-size: 14.5px; }
+  .flow-step code { font-size: 13px; background: var(--surface-2); padding: 1px 5px; border-radius: 3px; }
+
+  /* ---------- Status / role pills reused as legend ---------- */
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    padding: 3px 9px; border-radius: 999px;
+  }
+  .pill.pending { color: var(--status-pending); background: var(--status-pending-soft); }
+  .pill.processing { color: var(--status-processing); background: var(--status-processing-soft); }
+  .pill.delivered { color: var(--status-delivered); background: var(--status-delivered-soft); }
+  .pill-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 6px 0 22px; }
+  .arrow { color: var(--ink-faint); }
+
+  /* ---------- Credential cards ---------- */
+  .cred-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin: 8px 0 28px; }
+  .cred-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    padding: 14px 16px; box-shadow: var(--shadow);
+  }
+  .cred-card .role-tag { font-size: 10px; }
+  .cred-card dl { margin: 10px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 13.5px; }
+  .cred-card dt { color: var(--ink-faint); }
+  .cred-card dd { margin: 0; font-family: var(--mono); }
+
+  /* ---------- Checklist ---------- */
+  .checklist { display: flex; flex-direction: column; gap: 0; margin-bottom: 24px; }
+  .checklist .group-label {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-faint);
+    margin: 22px 0 8px;
+  }
+  .checklist .group-label:first-child { margin-top: 0; }
+  .check-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 4px; border-bottom: 1px solid var(--border);
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input[type="checkbox"] {
+    margin-top: 3px; width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0;
+  }
+  .check-item label { font-size: 14.5px; }
+  .check-item .expect { display: block; color: var(--ink-faint); font-size: 13px; margin-top: 2px; }
+
+  /* ---------- Callouts ---------- */
+  .callout {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 18px 0;
+    font-size: 14.5px;
+  }
+  .callout strong { color: var(--accent-ink); }
+  .callout.problem { border-left-color: var(--status-pending); }
+  .callout.problem strong { color: var(--status-pending); }
+
+  details.trouble {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    margin-bottom: 10px; box-shadow: var(--shadow);
+  }
+  details.trouble summary {
+    cursor: pointer; padding: 14px 18px; font-weight: 700; font-size: 14.5px;
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
+  }
+  details.trouble summary::-webkit-details-marker { display: none; }
+  details.trouble summary::after { content: "+"; font-family: var(--mono); color: var(--ink-faint); font-size: 18px; }
+  details.trouble[open] summary::after { content: "–"; }
+  details.trouble .trouble-body { padding: 0 18px 16px; color: var(--ink-soft); font-size: 14.5px; }
+  details.trouble .trouble-body code { background: var(--surface-2); padding: 1px 5px; border-radius: 3px; font-size: 13px; }
+
+  footer.doc-footer {
+    padding: 32px 0 8px; color: var(--ink-faint); font-size: 13px;
+  }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; gap: 20px; }
+    nav.toc {
+      position: static;
+      flex-direction: row;
+      overflow-x: auto;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+    nav.toc .toc-group { display: none; }
+    nav.toc a { border-left: none; border-bottom: 2px solid transparent; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="shell">
+
+  <header class="masthead">
+    <span class="eyebrow">Reference manual · v1.0</span>
+    <h1>HardwareHub</h1>
+    <p class="lede">
+      Setup, role-based user guide, and a testing checklist for the multi-vendor
+      e-commerce platform built from the ATI-Sammanthurai HND proposal —
+      hardware and grocery vendors, customers, and a single admin, on one MERN stack.
+    </p>
+    <div class="badge-row">
+      <span class="badge">MongoDB · Express · React · Node</span>
+      <span class="badge">JWT (httpOnly cookie)</span>
+      <span class="badge">3 roles</span>
+      <span class="badge">No payment gateway (by design)</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="toc">
+      <div class="toc-group">Manual</div>
+      <a href="#setup">Setup</a>
+      <a href="#reference">Quick reference</a>
+      <div class="toc-group">User guide</div>
+      <a href="#guide-customer">Customer</a>
+      <a href="#guide-vendor">Vendor</a>
+      <a href="#guide-admin">Admin</a>
+      <div class="toc-group">Verification</div>
+      <a href="#sample-data">Sample data</a>
+      <a href="#testing">Testing checklist</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+    </nav>
+
+    <main>
+
+      <!-- ================= SETUP ================= -->
+      <section class="block" id="setup">
+        <span class="eyebrow">01 · Setup</span>
+        <h2>Get it running locally</h2>
+        <p class="intro">
+          Five steps, run in order. The backend and frontend are separate npm
+          projects (<code>server/</code> and <code>client/</code>) that talk over HTTP;
+          MongoDB must be reachable before the backend starts.
+        </p>
+
+        <ol class="steps">
+          <li>
+            <h3>Start MongoDB</h3>
+            <p>The app expects a database at <code>mongodb://127.0.0.1:27017/ecommerce</code> (configurable in <code>server/.env</code>).</p>
+            <div class="code-block">
+              <button class="copy-btn" data-copy>Copy</button>
+              <pre><span class="comment"># if installed via Homebrew</span>
+brew services start mongodb-community
+<span class="comment"># or run it directly</span>
+mongod --dbpath /path/to/data</pre>
+            </div>
+          </li>
+          <li>
+            <h3>Install and configure the backend</h3>
+            <p><code>server/.env</code> ships with working local defaults, so this step usually needs no edits.</p>
+            <div class="code-block">
+              <button class="copy-btn" data-copy>Copy</button>
+              <pre>cd server
+npm install</pre>
+            </div>
+          </li>
+          <li>
+            <h3>Seed the database</h3>
+            <p>Admin isn't self-registerable, so it's created by script. Sample vendors/customers/products/orders and product images are optional but recommended for a populated first run.</p>
+            <div class="code-block">
+              <button class="copy-btn" data-copy>Copy</button>
+              <pre>npm run seed          <span class="comment"># creates the admin account</span>
+npm run seed:data     <span class="comment"># sample vendors, customers, products, orders</span>
+npm run seed:images   <span class="comment"># generates product icon images</span></pre>
+            </div>
+          </li>
+          <li>
+            <h3>Start the API</h3>
+            <div class="code-block">
+              <button class="copy-btn" data-copy>Copy</button>
+              <pre>npm run dev   <span class="comment"># http://localhost:5001</span></pre>
+            </div>
+          </li>
+          <li>
+            <h3>Install and start the frontend</h3>
+            <p>In a second terminal:</p>
+            <div class="code-block">
+              <button class="copy-btn" data-copy>Copy</button>
+              <pre>cd client
+npm install
+npm run dev   <span class="comment"># http://localhost:5173</span></pre>
+            </div>
+            <p>Open <strong>http://localhost:5173</strong> — that's the whole app.</p>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ================= QUICK REFERENCE ================= -->
+      <section class="block" id="reference">
+        <span class="eyebrow">02 · Quick reference</span>
+        <h2>Ports, scripts, environment</h2>
+        <p class="intro">Everything you'd otherwise have to open a file to check.</p>
+
+        <div class="table-wrap" style="margin-bottom: 22px;">
+          <table>
+            <caption>Running services</caption>
+            <thead><tr><th>Service</th><th>URL</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>Frontend (Vite)</td><td class="mono">localhost:5173</td><td class="wrap">React app, hot-reloads on save</td></tr>
+              <tr><td>Backend (Express)</td><td class="mono">localhost:5001</td><td class="wrap">Not 5000 — macOS AirPlay Receiver squats on that port</td></tr>
+              <tr><td>MongoDB</td><td class="mono">localhost:27017</td><td class="wrap">Database name: <code>ecommerce</code></td></tr>
+              <tr><td>Uploaded images</td><td class="mono">localhost:5001/uploads/…</td><td class="wrap">Served statically by Express</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap" style="margin-bottom: 22px;">
+          <table>
+            <caption>server/package.json scripts</caption>
+            <thead><tr><th>Command</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">npm run dev</td><td class="wrap">Starts the API with nodemon (auto-restart on file change)</td></tr>
+              <tr><td class="mono">npm run seed</td><td class="wrap">Creates the one admin account from <code>.env</code></td></tr>
+              <tr><td class="mono">npm run seed:data</td><td class="wrap">Idempotent — adds sample vendors/customers/products/orders if missing</td></tr>
+              <tr><td class="mono">npm run seed:images</td><td class="wrap">Generates and attaches an icon image per seeded product</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <caption>server/.env keys</caption>
+            <thead><tr><th>Key</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">MONGO_URI</td><td class="wrap">Mongoose connection string</td></tr>
+              <tr><td class="mono">JWT_SECRET</td><td class="wrap">Signs the auth cookie — change before any real deployment</td></tr>
+              <tr><td class="mono">CLIENT_URL</td><td class="wrap">Allowed CORS origin (must match the Vite dev URL)</td></tr>
+              <tr><td class="mono">ADMIN_EMAIL / ADMIN_PASSWORD</td><td class="wrap">Consumed only by <code>npm run seed</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= USER GUIDE ================= --> 
+      <section class="block" id="user-guide-intro">
+        <span class="eyebrow">03 · User guide</span>
+        <h2>Three roles, one storefront</h2>
+        <p class="intro">
+          Every account has exactly one role, fixed at registration. Customers and
+          vendors self-register and choose their role on the sign-up form; the
+          admin role is never exposed there — it exists only for the account
+          created by <code>npm run seed</code>.
+        </p>
+        <div class="role-grid">
+          <div class="role-card" style="--role-color: var(--role-customer); --role-soft: var(--role-customer-soft);">
+            <span class="role-tag">Customer</span>
+            <h3>Browses &amp; buys</h3>
+            <ul>
+              <li>Search and sort the shared catalog</li>
+              <li>Cart persists locally between visits</li>
+              <li>Places orders, tracks status</li>
+            </ul>
+          </div>
+          <div class="role-card" style="--role-color: var(--role-vendor); --role-soft: var(--role-vendor-soft);">
+            <span class="role-tag">Vendor</span>
+            <h3>Lists &amp; fulfills</h3>
+            <ul>
+              <li>Owns a private product catalog</li>
+              <li>Uploads a photo per product</li>
+              <li>Advances status on its own orders only</li>
+            </ul>
+          </div>
+          <div class="role-card" style="--role-color: var(--role-admin); --role-soft: var(--role-admin-soft);">
+            <span class="role-tag">Admin</span>
+            <h3>Oversees everything</h3>
+            <ul>
+              <li>Platform-wide stats and revenue</li>
+              <li>Manages every user, product, order</li>
+              <li>Cannot delete the admin account itself</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="role-section" id="guide-customer">
+        <span class="role-tag" style="--role-color: var(--role-customer); --role-soft: var(--role-customer-soft); color: var(--role-customer); background: var(--role-customer-soft);">Customer</span>
+        <h3 class="flow-title">Browse to delivered</h3>
+        <p class="flow-sub">The path a shopper takes from landing on the homepage to holding a confirmed order.</p>
+        <div class="flow">
+          <div class="flow-step" style="--role-color: var(--role-customer);">
+            <span class="dot"></span>
+            <div>
+              <strong>Create an account</strong>
+              <p>On <code>/register</code>, fill name, email, password, and select <strong>Customer</strong>. Submitting logs you in immediately — no separate confirmation step.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-customer);">
+            <span class="dot"></span>
+            <div>
+              <strong>Find a product</strong>
+              <p>On <code>/products</code>, type into the search box (matches name, description, or category) or reorder by price with the sort dropdown. Out-of-stock items are labeled and their <em>Add to Cart</em> is disabled.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-customer);">
+            <span class="dot"></span>
+            <div>
+              <strong>Add to cart</strong>
+              <p>From a product page, choose a quantity (capped at the vendor's current stock) and add it. The cart lives in <code>localStorage</code> — it survives a refresh but not a different browser or device.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-customer);">
+            <span class="dot"></span>
+            <div>
+              <strong>Review the cart</strong>
+              <p>On <code>/cart</code>, adjust quantities or remove lines. The subtotal recalculates live.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-customer);">
+            <span class="dot"></span>
+            <div>
+              <strong>Check out</strong>
+              <p>On <code>/checkout</code>, confirm the order total and place it. There's no payment form here — the proposal explicitly scopes online payment out of this version, so placing the order is the final step.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-customer);">
+            <span class="dot"></span>
+            <div>
+              <strong>Track it</strong>
+              <p>On <code>/orders</code>, each past order shows its line items, total, and current status.</p>
+              <div class="pill-row">
+                <span class="pill pending">Pending</span><span class="arrow">→</span>
+                <span class="pill processing">Processing</span><span class="arrow">→</span>
+                <span class="pill delivered">Delivered</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="role-section" id="guide-vendor">
+        <span class="role-tag" style="color: var(--role-vendor); background: var(--role-vendor-soft);">Vendor</span>
+        <h3 class="flow-title">List a product, fulfill an order</h3>
+        <p class="flow-sub">Vendors only ever see and act on their own inventory and the orders that contain it.</p>
+        <div class="flow">
+          <div class="flow-step" style="--role-color: var(--role-vendor);">
+            <span class="dot"></span>
+            <div>
+              <strong>Register as a vendor</strong>
+              <p>Same form as a customer, with <strong>Vendor</strong> selected. This redirects straight to the Vendor Dashboard instead of the storefront home.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-vendor);">
+            <span class="dot"></span>
+            <div>
+              <strong>Check the overview</strong>
+              <p><code>/vendor</code> shows three live counters: products listed, orders received, and estimated revenue from those orders.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-vendor);">
+            <span class="dot"></span>
+            <div>
+              <strong>Add a product</strong>
+              <p>Under <em>My Products</em>, <strong>+ Add Product</strong> opens a form for name, category, price, stock, description, and an image file. The image is optional but strongly recommended — products without one show a plain "No image" placeholder to shoppers.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-vendor);">
+            <span class="dot"></span>
+            <div>
+              <strong>Edit or retire a listing</strong>
+              <p>Each row has <em>Edit</em> (same form, pre-filled — leave the image field empty to keep the existing photo) and <em>Delete</em> (immediate, with a confirmation prompt).</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-vendor);">
+            <span class="dot"></span>
+            <div>
+              <strong>Fulfill an order</strong>
+              <p>Under <em>Orders</em>, every order containing at least one of your products appears with the buyer's name and the full line-item list. Move the status dropdown from Pending to Processing to Delivered as the order actually progresses — the customer sees the update immediately on their next visit to Order History.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="role-section" id="guide-admin">
+        <span class="role-tag" style="color: var(--role-admin); background: var(--role-admin-soft);">Admin</span>
+        <h3 class="flow-title">Oversee the marketplace</h3>
+        <p class="flow-sub">One account, created only via <code>npm run seed</code>, with visibility across every vendor and customer.</p>
+        <div class="flow">
+          <div class="flow-step" style="--role-color: var(--role-admin);">
+            <span class="dot"></span>
+            <div>
+              <strong>Sign in</strong>
+              <p>Use the credential from <code>server/.env</code> (defaults printed in <a href="#sample-data">Sample data</a> below) at <code>/login</code>. There's no admin sign-up path by design.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-admin);">
+            <span class="dot"></span>
+            <div>
+              <strong>Read the overview</strong>
+              <p><code>/admin</code> totals users (split by role), products, orders, and cumulative revenue across the whole platform.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-admin);">
+            <span class="dot"></span>
+            <div>
+              <strong>Manage users</strong>
+              <p><em>Users</em> lists every account with its role. Any customer or vendor can be deleted; the admin row has no delete control — the backend refuses that call even if attempted directly.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-admin);">
+            <span class="dot"></span>
+            <div>
+              <strong>Manage products</strong>
+              <p><em>Products</em> lists every vendor's catalog in one table, with the owning vendor's name attached, and a direct delete action that bypasses ownership checks.</p>
+            </div>
+          </div>
+          <div class="flow-step" style="--role-color: var(--role-admin);">
+            <span class="dot"></span>
+            <div>
+              <strong>Manage orders</strong>
+              <p><em>Orders</em> lists every order platform-wide and lets the admin set status directly — useful for resolving a case a vendor hasn't acted on.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SAMPLE DATA ================= -->
+      <section class="block" id="sample-data">
+        <span class="eyebrow">04 · Sample data</span>
+        <h2>Accounts ready to log into</h2>
+        <p class="intro">
+          <code>npm run seed</code> and <code>npm run seed:data</code> together populate
+          the accounts below, plus 15 products (5 per vendor) and 3 orders in different
+          statuses, so the app looks and behaves like a real marketplace on first login.
+        </p>
+
+        <div class="cred-grid">
+          <div class="cred-card">
+            <span class="role-tag" style="color: var(--role-admin); background: var(--role-admin-soft);">Admin</span>
+            <dl>
+              <dt>Email</dt><dd>admin@example.com</dd>
+              <dt>Password</dt><dd>Admin@12345</dd>
+            </dl>
+          </div>
+          <div class="cred-card">
+            <span class="role-tag" style="color: var(--role-vendor); background: var(--role-vendor-soft);">Vendor</span>
+            <dl>
+              <dt>Email</dt><dd>lankahardware@test.com</dd>
+              <dt>Password</dt><dd>Test@12345</dd>
+              <dt>Sells</dt><dd class="wrap">Tools, power tools, safety gear</dd>
+            </dl>
+          </div>
+          <div class="cred-card">
+            <span class="role-tag" style="color: var(--role-vendor); background: var(--role-vendor-soft);">Vendor</span>
+            <dl>
+              <dt>Email</dt><dd>colombotools@test.com</dd>
+              <dt>Password</dt><dd>Test@12345</dd>
+              <dt>Sells</dt><dd class="wrap">Fasteners, plumbing, electrical, paint</dd>
+            </dl>
+          </div>
+          <div class="cred-card">
+            <span class="role-tag" style="color: var(--role-vendor); background: var(--role-vendor-soft);">Vendor</span>
+            <dl>
+              <dt>Email</dt><dd>kandysupermart@test.com</dd>
+              <dt>Password</dt><dd>Test@12345</dd>
+              <dt>Sells</dt><dd class="wrap">Groceries</dd>
+            </dl>
+          </div>
+          <div class="cred-card">
+            <span class="role-tag" style="color: var(--role-customer); background: var(--role-customer-soft);">Customer</span>
+            <dl>
+              <dt>Email</dt><dd>nimal.perera@test.com</dd>
+              <dt>Password</dt><dd>Test@12345</dd>
+              <dt>Has</dt><dd class="wrap">1 Delivered, 1 Processing order</dd>
+            </dl>
+          </div>
+          <div class="cred-card">
+            <span class="role-tag" style="color: var(--role-customer); background: var(--role-customer-soft);">Customer</span>
+            <dl>
+              <dt>Email</dt><dd>fathima.rizvi@test.com</dd>
+              <dt>Password</dt><dd>Test@12345</dd>
+              <dt>Has</dt><dd class="wrap">1 Pending order</dd>
+            </dl>
+          </div>
+        </div>
+
+        <div class="callout">
+          <strong>Note —</strong> both seed scripts are idempotent: re-running them
+          skips anything that already exists by email or product name, so they're
+          safe to run again after pulling changes.
+        </div>
+      </section>
+
+      <!-- ================= TESTING ================= -->
+      <section class="block" id="testing">
+        <span class="eyebrow">05 · Testing checklist</span>
+        <h2>Walk the whole loop once</h2>
+        <p class="intro">
+          This is the same path used to smoke-test the build: one full order from
+          registration to delivery, seen from all three roles, plus the boundary
+          cases worth trying on purpose. Check items off as you verify them.
+        </p>
+
+        <div class="checklist">
+          <div class="group-label">Customer flow</div>
+          <div class="check-item">
+            <input type="checkbox" id="c1" /><label for="c1">Register a new customer account and land on the homepage<span class="expect">Expect: immediately logged in, no separate confirmation step</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="c2" /><label for="c2">Search for a known product name on <code>/products</code><span class="expect">Expect: only matching items remain, sort dropdown still works on the filtered set</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="c3" /><label for="c3">Open a product and try to order more than its stock<span class="expect">Expect: quantity input caps at the current stock value</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="c4" /><label for="c4">Add to cart, then adjust quantity and remove a line from <code>/cart</code><span class="expect">Expect: subtotal updates live, survives a page refresh</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="c5" /><label for="c5">Place the order from <code>/checkout</code><span class="expect">Expect: no payment form appears; redirected to Order History showing status Pending</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="c6" /><label for="c6">Reload Order History after a vendor changes status<span class="expect">Expect: badge updates without needing to log out/in</span></label>
+          </div>
+
+          <div class="group-label">Vendor flow</div>
+          <div class="check-item">
+            <input type="checkbox" id="v1" /><label for="v1">Register a vendor account and confirm the redirect target<span class="expect">Expect: lands on <code>/vendor</code>, not the storefront home</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="v2" /><label for="v2">Create a product with an image, then find it in the public catalog<span class="expect">Expect: image renders on the card and detail page via <code>/uploads/…</code></span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="v3" /><label for="v3">Edit that product's price without re-uploading an image<span class="expect">Expect: price updates, original image is retained</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="v4" /><label for="v4">Delete a product that has no pending orders<span class="expect">Expect: removed from both vendor list and public catalog</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="v5" /><label for="v5">Advance the customer's order: Pending → Processing<span class="expect">Expect: status updates instantly in the vendor's own order list</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="v6" /><label for="v6">Try opening a URL for another vendor's product edit form directly<span class="expect">Expect: request is rejected — ownership is checked server-side, not just hidden in the UI</span></label>
+          </div>
+
+          <div class="group-label">Admin flow</div>
+          <div class="check-item">
+            <input type="checkbox" id="a1" /><label for="a1">Sign in with the seeded admin credential<span class="expect">Expect: overview shows non-zero totals once sample data is seeded</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="a2" /><label for="a2">Attempt to delete the admin's own row from Users<span class="expect">Expect: no delete control is shown for the admin row</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="a3" /><label for="a3">Delete a product from the platform-wide Products list<span class="expect">Expect: succeeds regardless of which vendor owns it</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="a4" /><label for="a4">Push an order straight to Delivered from Admin Orders<span class="expect">Expect: reflected immediately in the customer's Order History</span></label>
+          </div>
+
+          <div class="group-label">Access control</div>
+          <div class="check-item">
+            <input type="checkbox" id="x1" /><label for="x1">While logged in as a customer, navigate to <code>/vendor</code> or <code>/admin</code><span class="expect">Expect: redirected away, dashboard never renders</span></label>
+          </div>
+          <div class="check-item">
+            <input type="checkbox" id="x2" /><label for="x2">Log out, then try <code>/cart</code> or <code>/orders</code> directly<span class="expect">Expect: redirected to <code>/login</code></span></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= TROUBLESHOOTING ================= -->
+      <section class="block" id="troubleshooting">
+        <span class="eyebrow">06 · Troubleshooting</span>
+        <h2>When a step doesn't do what this doc says</h2>
+
+        <details class="trouble">
+          <summary>Backend crashes with <code>EADDRINUSE</code> on port 5000</summary>
+          <div class="trouble-body">
+            <p>On macOS, the AirPlay Receiver (Control Center) listens on port 5000 by default. This project's backend already defaults to <strong>5001</strong> for exactly this reason — if you changed <code>PORT</code> back to 5000, either pick a different port or turn off AirPlay Receiver in System Settings → General → AirDrop &amp; Handoff.</p>
+          </div>
+        </details>
+
+        <details class="trouble">
+          <summary>Frontend loads but every request fails / CORS error in the console</summary>
+          <div class="trouble-body">
+            <p>Check two things line up: <code>CLIENT_URL</code> in <code>server/.env</code> must exactly match the URL the frontend is actually served from (protocol, host, and port), and the frontend's API base URL (<code>client/src/api/axios.js</code>) must point at the backend's actual port.</p>
+          </div>
+        </details>
+
+        <details class="trouble">
+          <summary>Login succeeds but refreshing the page logs you out</summary>
+          <div class="trouble-body">
+            <p>Auth is a JWT stored in an httpOnly cookie, restored on load via <code>GET /api/auth/me</code>. If that call fails silently, check the backend is actually running and that the browser isn't blocking third-party cookies between the two localhost ports (Safari's default tracking prevention can do this — Chrome and Firefox do not, for localhost).</p>
+          </div>
+        </details>
+
+        <details class="trouble">
+          <summary>Product images don't show, just a "No image" placeholder</summary>
+          <div class="trouble-body">
+            <p>Either the product was created without a file attached, or <code>npm run seed:images</code> hasn't been run yet for sample data. Uploaded files live in <code>server/uploads/</code> — confirm the folder isn't empty and that the backend's static file route is reachable at <code>http://localhost:5001/uploads/&lt;filename&gt;</code>.</p>
+          </div>
+        </details>
+
+        <details class="trouble">
+          <summary><code>mongod</code> won't start, or the app can't connect to MongoDB</summary>
+          <div class="trouble-body">
+            <p>Confirm nothing else is already bound to port 27017 (<code>lsof -i :27017</code>), and that the data directory passed to <code>--dbpath</code> exists and is writable. If MongoDB is already running as a background service, you don't need to start it again — just confirm it's up before running <code>npm run seed</code>.</p>
+          </div>
+        </details>
+
+        <details class="trouble">
+          <summary>Placing an order fails with "Insufficient stock"</summary>
+          <div class="trouble-body">
+            <p>Stock is decremented at order time and re-validated against the database, not just the number shown in the UI. If two customers try to buy the last unit of the same item, the second checkout will correctly fail this way rather than overselling.</p>
+          </div>
+        </details>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="doc-footer">
+    HardwareHub — built to the scope of the ATI-Sammanthurai HND proposal: no online payment gateway, no delivery tracking, no mobile app in this version.
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var pre = btn.parentElement.querySelector('pre');
+      var text = pre.innerText;
+      navigator.clipboard.writeText(text).then(function () {
+        btn.dataset.copied = 'true';
+        var original = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(function () {
+          btn.textContent = original;
+          btn.dataset.copied = 'false';
+        }, 1600);
+      });
+    });
+  });
+</script>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_ORIGIN = 'http://localhost:5002';
+export const API_ORIGIN = 'https://honest-clarity-production-2076.up.railway.app';
 
 const api = axios.create({
   baseURL: `${API_ORIGIN}/api`,
